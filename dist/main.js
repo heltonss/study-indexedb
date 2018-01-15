@@ -75,10 +75,32 @@ var UsuarioDAO = /** @class */ (function () {
             };
         };
     };
+    UsuarioDAO.prototype.updateObject = function (client, id) {
+        var connection = this.openDatabase();
+        console.log('banco ', connection);
+        connection.onsuccess = function (event) {
+            console.log('target ', event);
+            var db = connection.result;
+            var request = db.transaction('clientes', 'readwrite').objectStore('clientes').put(client, id);
+            request.onsuccess = function () {
+                console.log("Registro atualizado com sucesso");
+            };
+            request.onerror = function () {
+                console.log(request.error);
+            };
+        };
+    };
     return UsuarioDAO;
 }());
 var user = new UsuarioDAO();
-user.populateDataBase();
+// user.populateDataBase();
 // user.readUsers();
 user.readAll();
+var up = {
+    age: 36,
+    email: "donna@home.org",
+    id: "2",
+    name: "Donna Summer Wall"
+};
+user.updateObject(up);
 //# sourceMappingURL=main.js.map

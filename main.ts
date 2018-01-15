@@ -53,7 +53,7 @@ class UsuarioDAO {
         let db, transaction, objectStore, request;
 
         const connection = this.openDatabase();
-        
+
         connection.onsuccess = (event) => {
             db = connection.result;
             transaction = db.transaction(["clientes"]);
@@ -70,34 +70,63 @@ class UsuarioDAO {
             };
         };
     }
-    
+
     readAll() {
         let db;
         const connection = this.openDatabase();
-        
+
         connection.onsuccess = (event) => {
-            db = connection.result; 
+            db = connection.result;
             let objectStore = db.transaction("clientes").objectStore("clientes");
-            
+
             objectStore.openCursor().onsuccess = function (event) {
                 var cursor = event.target.result;
-                console.log('%c cursor ' + JSON.stringify(cursor) ,'background: yellow')
-                
+                console.log('%c cursor ' + JSON.stringify(cursor), 'background: yellow')
+
                 if (cursor) {
                     console.log("Name for id " + cursor.key + " is " + cursor.value.name + ", Age: " + cursor.value.age + ", Email: " + cursor.value.email);
                     cursor.continue();
                 }
-                
+
                 else {
                     console.log("No more entries!");
                 }
             };
         }
     }
+
+    updateObject(client, id?) {
+        const connection = this.openDatabase()
+        console.log('banco ', connection)
+
+        connection.onsuccess = (event) => {
+            console.log('target ', event)
+            const db = connection.result
+
+            let request = db.transaction('clientes', 'readwrite').objectStore('clientes').put(client, id);
+
+            request.onsuccess = () => {
+                console.log("Registro atualizado com sucesso")
+            }
+
+            request.onerror = () => {
+                console.log(request.error)
+            }
+        }
+    }
 }
 
 const user = new UsuarioDAO();
 
-user.populateDataBase();
+// user.populateDataBase();
 // user.readUsers();
 user.readAll();
+
+const up = {
+    age: 36,
+    email: "donna@home.org",
+    id: "2",
+    name: "Donna Summer Wall"
+}
+
+user.updateObject(up);

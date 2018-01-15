@@ -23,23 +23,43 @@ export class UsuarioDAO {
         const request = this.createDatabase();
 
         request.onupgradeneeded = function (event) {
-            var db = event.target.result;
+            let db = event.target.result;
 
             // Create an objectStore to hold information about our customers. We're
             // going to use "ssn" as our key path because it's guaranteed to be
             // unique - or at least that's what I was told during the kickoff meeting.
-            var objectStore = db.createObjectStore("clientes", { keyPath: "id" });
+            let objectStore = db.createObjectStore("clientes", { keyPath: "id" });
 
 
             // Use transaction oncomplete to make sure the objectStore creation is 
             // finished before adding data into it.
             objectStore.transaction.oncomplete = function (event) {
                 // Store values in the newly created objectStore.
-                var customerObjectStore = db.transaction("customers", "readwrite").objectStore("customers");
-                for (var i in this.customerData) {
+                let customerObjectStore = db.transaction("customers", "readwrite").objectStore("customers");
+                for (let i in this.customerData) {
                     customerObjectStore.add(this.customerData[i]);
                 }
             };
+        }
+    }
+
+    updateObject(client, id) {
+        const db = this.createDatabase()
+
+        db.onupgradeneeded =  (event) => {
+            let db = event.target.result;
+
+            let request = db.transaction('clientes', 'readwrite')
+                .objectStore('clientes')
+                .put(client, id);
+
+            request.onsuccess = () => {
+                console.log("Registro atualizado com sucesso")
+            }
+
+            request.onerror = () => {
+                console.log(request.error)
+            }
         }
     }
 }
